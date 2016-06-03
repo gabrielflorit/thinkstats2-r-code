@@ -1,0 +1,32 @@
+---
+title: "Think Stats - Chapter 1"
+author: "Gabriel Florit"
+output:
+	html_document:
+		self_contained: false
+---
+
+```{r, echo=F, results='hide', warning=F, message=F}
+library(StataDCTutils)
+setwd("~/Documents/other/thinkstats2-r-code/data")
+```
+
+```{r}
+
+# parse STATA dictionary file
+fempregdict <- dct.parser('2002FemPreg.dct')
+
+# convert dictionary to csvkit schema
+csvkit.schema(fempregdict)
+
+# convert data file to csv
+csvkit.fwf2csv(datafile='2002FemPreg.dat', schema='2002FemPreg.dct.csv', output='2002FemPreg.csv')
+
+```
+
+```{r}
+
+# fempreg <- read.csv('2002FemPreg.csv', strip.white=TRUE, stringsAsFactors=FALSE, row.names=NULL)
+fempreg <- read.csv('2002FemPreg.csv', row.names=NULL)
+
+```
