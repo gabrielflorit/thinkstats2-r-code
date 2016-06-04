@@ -32,13 +32,10 @@ setwd("~/Documents/other/thinkstats2-r-code")
 fempreg <- read.csv('data/2002FemPreg.csv', row.names=NULL) %>%
 	mutate(
 		agepreg = agepreg / 100,
-		birthwgt_lb = plyr::mapvalues(birthwgt_lb, c(97, 98, 99), c(NA, NA, NA)),
+		birthwgt_lb = ifelse(birthwgt_lb > 20, NA, birthwgt_lb),
 		birthwgt_oz = plyr::mapvalues(birthwgt_oz, c(97, 98, 99), c(NA, NA, NA)),
 		totalwgt_lb = birthwgt_lb + birthwgt_oz / 16,
 		firstbaby = ifelse(birthord == 1, 'first', 'other')
-	) %>%
-	mutate(
-		birthwgt_lb = ifelse(birthwgt_lb > 20, NA, birthwgt_lb)
 	)
 
 ```
@@ -50,24 +47,16 @@ live <- fempreg %>%
 	filter(outcome == 1)
 
 # histogram of pound part of birth weight
-live %>%
-	ggplot(aes(birthwgt_lb)) +
-	geom_histogram(binwidth=1)
+ggplot(live, aes(birthwgt_lb)) + geom_histogram(binwidth=1)
 
 # histogram of ounce part of birth weight
-live %>%
-	ggplot(aes(birthwgt_oz)) +
-	geom_histogram(binwidth=1)
+ggplot(live, aes(birthwgt_oz)) + geom_histogram(binwidth=1)
 
 # histogram of mother's age at end of pregnancy
-live %>%
-	ggplot(aes(agepreg)) +
-	geom_histogram(binwidth=1)
+ggplot(live, aes(agepreg)) + geom_histogram(binwidth=1)
 
 # histogram of pregnancy length in weeeks
-live %>%
-	ggplot(aes(prglngth)) +
-	geom_histogram(binwidth=1)
+ggplot(live, aes(prglngth)) + geom_histogram(binwidth=1)
 
 ```
 
