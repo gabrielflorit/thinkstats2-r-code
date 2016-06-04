@@ -6,15 +6,15 @@ output:
     self_contained: true
 ---
 
-```{r, echo=F, results='hide', warning=F, message=F}
+```{r, results='hide', warning=F, message=F}
 library(dplyr)
 library(ggplot2)
 library(effsize)
 library(StataDCTutils)
-setwd("~/Documents/other/thinkstats2-r-code")
 ```
 
 ```{r, echo=F}
+setwd("~/Documents/other/thinkstats2-r-code")
 # parse STATA dictionary file
 #fempregdict <- dct.parser('./2002FemPreg.dct')
 
