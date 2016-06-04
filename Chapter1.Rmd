@@ -9,6 +9,7 @@ output:
 ```{r, echo=F, results='hide', warning=F, message=F}
 library(dplyr)
 library(ggplot2)
+library(effsize)
 library(StataDCTutils)
 setwd("~/Documents/other/thinkstats2-r-code")
 ```
@@ -26,7 +27,7 @@ setwd("~/Documents/other/thinkstats2-r-code")
 ```
 
 ## 1.6 Transformation
-```{r }
+```{r, warning=F}
 
 fempreg <- read.csv('data/2002FemPreg.csv', row.names=NULL) %>%
 	mutate(
@@ -42,7 +43,7 @@ fempreg <- read.csv('data/2002FemPreg.csv', row.names=NULL) %>%
 ```
 
 ## 2.3 Plotting histograms
-```{r}
+```{r, warning=F}
 
 live <- fempreg %>%
 	filter(outcome == 1)
@@ -69,9 +70,67 @@ live %>%
 
 ```
 
+## 2.5 Outliers
+```{r, warning=F}
 
+# Get 10 lowest values
+plyr::count(live$prglngth) %>% head(10)
 
+# Get 10 highest values
+plyr::count(live$prglngth) %>% tail(10)
 
+```
+
+## 2.6 First babies
+```{r, warning=F}
+
+live %>%
+	mutate(firstbaby = ifelse(birthord == 1, 'first', 'other')) %>%
+	ggplot(aes(x=prglngth, fill=firstbaby)) +
+	geom_histogram(binwidth=1, position='dodge') +
+	xlab('weeks') +
+	xlim(27, 46)
+	
+```
+
+## 2.8 Variance
+```{r, warning=F}
+
+mean(live$prglngth)
+var(live$prglngth)
+sd(live$prglngth)
+
+```
+
+## 2.9 Effect size
+```{r, warning=F}
+
+# Calculate Cohen's d for pregnancy length of first babies vs others
+
+cohen.d(
+	(live %>% filter(birthord == 1))$prglngth,
+	(live %>% filter(birthord > 1))$prglngth
+)
+
+```
+
+## 3.2 Plotting PMFs
+```{r, warning=F}
+
+p <- live %>%
+	mutate(firstbaby = ifelse(birthord == 1, 'first', 'other')) %>%
+	group_by(prglngth, firstbaby) %>%
+	summarise(count = n(), freq = nrow(.[.$firstbaby == firstbaby, ])) %>%
+	ggplot(aes(x=prglngth, y=count/freq, fill=firstbaby, color=firstbaby)) +
+	xlim(27, 46) +
+	xlab('weeks') + ylab('probability')
+
+p1 <- p + geom_bar(stat='identity', position='dodge')
+p2 <- p + geom_step(stat='identity')
+
+Rmisc::multiplot(p1, p2, cols=2)
+	
+```
 
 
 
