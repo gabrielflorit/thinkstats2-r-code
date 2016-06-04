@@ -34,7 +34,8 @@ fempreg <- read.csv('data/2002FemPreg.csv', row.names=NULL) %>%
 		agepreg = agepreg / 100,
 		birthwgt_lb = plyr::mapvalues(birthwgt_lb, c(97, 98, 99), c(NA, NA, NA)),
 		birthwgt_oz = plyr::mapvalues(birthwgt_oz, c(97, 98, 99), c(NA, NA, NA)),
-		totalwgt_lb = birthwgt_lb + birthwgt_oz / 16
+		totalwgt_lb = birthwgt_lb + birthwgt_oz / 16,
+		firstbaby = ifelse(birthord == 1, 'first', 'other')
 	) %>%
 	mutate(
 		birthwgt_lb = ifelse(birthwgt_lb > 20, NA, birthwgt_lb)
@@ -85,7 +86,6 @@ plyr::count(live$prglngth) %>% tail(10)
 ```{r, warning=F}
 
 live %>%
-	mutate(firstbaby = ifelse(birthord == 1, 'first', 'other')) %>%
 	ggplot(aes(x=prglngth, fill=firstbaby)) +
 	geom_histogram(binwidth=1, position='dodge') +
 	xlab('weeks') +
@@ -117,11 +117,13 @@ cohen.d(
 ## 3.2 Plotting PMFs
 ```{r, warning=F}
 
-p <- live %>%
-	mutate(firstbaby = ifelse(birthord == 1, 'first', 'other')) %>%
+firstbabyfreqs <- live %>%
 	group_by(prglngth, firstbaby) %>%
 	summarise(count = n(), freq = nrow(.[.$firstbaby == firstbaby, ])) %>%
-	ggplot(aes(x=prglngth, y=count/freq, fill=firstbaby, color=firstbaby)) +
+	mutate(freq = count/freq)
+
+p <- firstbabyfreqs %>%
+	ggplot(aes(x=prglngth, y=freq, fill=firstbaby, color=firstbaby)) +
 	xlim(27, 46) +
 	xlab('weeks') + ylab('probability')
 
@@ -130,6 +132,20 @@ p2 <- p + geom_step(stat='identity')
 
 Rmisc::multiplot(p1, p2, cols=2)
 	
+```
+
+## 3.3 Other visualizations
+```{r, warning=F}
+
+firstbabyfreqs %>%
+	group_by(prglngth) %>%
+	arrange(firstbaby) %>%
+	summarize(difference = 100*(first(freq) - last(freq))) %>%
+	ggplot(aes(x=prglngth, y=difference)) +
+	geom_bar(stat='identity') +
+	xlim(34, 46) +
+	xlab('weeks') + ylab('percentage points')
+
 ```
 
 
