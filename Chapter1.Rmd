@@ -1,32 +1,106 @@
 ---
-title: "Think Stats - Chapter 1"
+title: "Think Stats - R code"
 author: "Gabriel Florit"
 output:
-	html_document:
-		self_contained: false
+  html_document:
+    self_contained: true
 ---
 
 ```{r, echo=F, results='hide', warning=F, message=F}
+library(dplyr)
+library(ggplot2)
 library(StataDCTutils)
-setwd("~/Documents/other/thinkstats2-r-code/data")
+setwd("~/Documents/other/thinkstats2-r-code")
 ```
 
-```{r}
-
+```{r, echo=F}
 # parse STATA dictionary file
-fempregdict <- dct.parser('2002FemPreg.dct')
+#fempregdict <- dct.parser('./2002FemPreg.dct')
 
 # convert dictionary to csvkit schema
-csvkit.schema(fempregdict)
+#csvkit.schema(fempregdict)
 
 # convert data file to csv
-csvkit.fwf2csv(datafile='2002FemPreg.dat', schema='2002FemPreg.dct.csv', output='2002FemPreg.csv')
+#csvkit.fwf2csv(datafile='2002FemPreg.dat', schema='2002FemPreg.dct.csv', output='2002FemPreg.csv')
 
 ```
 
+## 1.6 Transformation
+```{r }
+
+fempreg <- read.csv('data/2002FemPreg.csv', row.names=NULL) %>%
+	mutate(
+		agepreg = agepreg / 100,
+		birthwgt_lb = plyr::mapvalues(birthwgt_lb, c(97, 98, 99), c(NA, NA, NA)),
+		birthwgt_oz = plyr::mapvalues(birthwgt_oz, c(97, 98, 99), c(NA, NA, NA)),
+		totalwgt_lb = birthwgt_lb + birthwgt_oz / 16
+	) %>%
+	mutate(
+		birthwgt_lb = ifelse(birthwgt_lb > 20, NA, birthwgt_lb)
+	)
+
+```
+
+## 2.3 Plotting histograms
 ```{r}
 
-# fempreg <- read.csv('2002FemPreg.csv', strip.white=TRUE, stringsAsFactors=FALSE, row.names=NULL)
-fempreg <- read.csv('2002FemPreg.csv', row.names=NULL)
+live <- fempreg %>%
+	filter(outcome == 1)
+
+# histogram of pound part of birth weight
+live %>%
+	ggplot(aes(birthwgt_lb)) +
+	geom_histogram(binwidth=1)
+
+# histogram of ounce part of birth weight
+live %>%
+	ggplot(aes(birthwgt_oz)) +
+	geom_histogram(binwidth=1)
+
+# histogram of mother's age at end of pregnancy
+live %>%
+	ggplot(aes(agepreg)) +
+	geom_histogram(binwidth=1)
+
+# histogram of pregnancy length in weeeks
+live %>%
+	ggplot(aes(prglngth)) +
+	geom_histogram(binwidth=1)
 
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
