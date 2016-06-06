@@ -171,6 +171,26 @@ class_size %>%
 
 ```
 
+## 4.4 Representing CDFs
+```{r}
+
+live %>%
+	ggplot(aes(prglngth)) +
+	stat_ecdf() +
+	xlab('weeks') + ylab('CDF')
+
+```
+
+## 4.5 Comparing CDFs
+```{r}
+
+live %>%
+	ggplot(aes(totalwgt_lb, color=firstbaby)) +
+	stat_ecdf() +
+	xlab('pounds') + ylab('CDF')
+
+```
+
 
 
 
