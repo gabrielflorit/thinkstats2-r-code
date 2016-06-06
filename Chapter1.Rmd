@@ -7,6 +7,7 @@ output:
 ---
 
 ```{r, results='hide', warning=F, message=F}
+library(tidyr)
 library(dplyr)
 library(ggplot2)
 library(effsize)
@@ -141,7 +142,7 @@ firstbabyfreqs %>%
 ## 3.4 The class size paradox
 ```{r}
 
-frame_data(
+class_size <- frame_data(
 	~size,~count,
 	7,8,
 	12,8,
@@ -152,10 +153,21 @@ frame_data(
 	37,8,
 	42,3,
 	47,2
-) %>%
-	summarise(
-		mean = sum(size*count)/sum(count)
-	)
+)
+
+class_size %>%
+	summarise(mean = sum(size*count)/sum(count))
+
+class_size <- class_size %>%
+	mutate(
+		unbiased = count/sum(count),
+		biased = (unbiased * size)/sum(unbiased * size)
+	) %>%
+	gather(distribution, probability, unbiased:biased)
+
+class_size %>%
+	ggplot(aes(x=size, y=probability, color=distribution)) +
+	geom_step(stat='identity')
 
 ```
 
