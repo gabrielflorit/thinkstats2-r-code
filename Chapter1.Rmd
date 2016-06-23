@@ -57,7 +57,7 @@ ggplot(live, aes(birthwgt_oz)) + geom_histogram(binwidth=1)
 # histogram of mother's age at end of pregnancy
 ggplot(live, aes(agepreg)) + geom_histogram(binwidth=1)
 
-# histogram of pregnancy length in weeeks
+# histogram of pregnancy length in weeks
 ggplot(live, aes(prglngth)) + geom_histogram(binwidth=1)
 
 ```
@@ -142,6 +142,26 @@ firstbabyfreqs %>%
 ## 3.4 The class size paradox
 ```{r}
 
+frame_data(
+		~miles,
+		10,
+		20,
+		30,
+		40,
+		50
+	) %>%
+	summarise(sd = sd(miles))
+
+frame_data(
+		~miles,
+		10,
+		10,
+		10,
+		50,
+		50
+	) %>%
+	summarise(sd = sd(miles))
+
 class_size <- frame_data(
 	~size,~count,
 	7,8,
@@ -191,23 +211,24 @@ live %>%
 
 ```
 
+```{r}
 
+poll <- frame_data(
+	~opinion, ~party, ~count,
+	'more', 'gop', 54,
+	'less', 'gop', 9,
+	'same', 'gop', 9,
+	'more', 'dem', 235,
+	'less', 'dem', 11,
+	'same', 'dem', 26,
+	'more', 'ind', 63,
+	'less', 'ind', 9,
+	"same", "ind", 61
+)
 
+rowPerc(xtabs(count ~ opinion+party, data=poll))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```
 
 
 
